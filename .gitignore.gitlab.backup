@@ -1,0 +1,98 @@
+/avro
+.vscode/
+.env
+cache/
+.python-version
+.venv/
+wheelhouse/
+build/
+.venv/
+.python-version
+log/
+test*
+cache/
+ignore/
+*.ipynb*
+*.ipynb*/
+*pycache*
+*pycache*/
+*.DS_Store*
+*.DS_Store*/
+dist/
+*egg-info/
+__*
+!__init__.py
+TODO
+agentsociety-sim
+agentsociety-ui
+# Poetry lock file (keep pyproject.toml)
+poetry.lock
+# But keep pyproject.toml
+!pyproject.toml
+logs/
+agentsociety_ecosim/consumer_modeling/output/*
+agentsociety_ecosim/consumer_modeling/assessment/*
+
+# Documentation (keep important docs, ignore others)
+# Ignore all .md files first
+*.md
+# Then explicitly keep important documentation files
+!README.md
+!**/README.md
+!SETUP.md
+!**/SETUP.md
+!DIRECTORY_STRUCTURE_EXAMPLE.md
+!GIT_COMMIT_CHECKLIST.md
+!CHANGELOG.md
+!CONTRIBUTING.md
+!LICENSE
+!ARCHITECTURE.md
+!DEPLOYMENT.md
+!database/DEEP_SEARCH_PROMPT.md
+!agentsociety_ecosim/mcp_server/docs/*.md
+!**/评估系统指标设计与数据说明.md
+!**/公司信息指南.md
+# Explicitly keep SETUP.md in subdirectories
+!agentsociety_ecosim/SETUP.md
+
+.history/
+simulation_*
+output/
+*.log
+
+# Environment files (keep .env.example templates)
+.env
+.env.local
+.env.*.local
+!.env.example
+!**/.env.example
+agentsociety_ecosim/consumer_modeling/输出结果保存
+agentsociety_ecosim/outputs
+agentsociety_ecosim/temp
+agentsociety_ecosim/consumer_modeling/household_data
+agentsociety_ecosim/outputs
+outputs/
+
+# Database datasets (large files, do not track)
+database/Crawl_Results/Articles1219/
+database/Crawl_Results/Articles/
+
+# Test files and development artifacts
+**/test*.py
+**/test_retrieval.py
+**/test*.ipynb
+**/plt.ipynb
+database/build_index.log
+
+# Experiment history and generated figures
+economist/experiments/
+economist/fig/
+economist/logs/
+economist/a_case/
+# Qdrant local data (should use Docker remote mode)
+# Allow storage.sqlite files, exclude other files
+database/qdrant_data/.lock
+database/qdrant_data/meta.json
+database/qdrant_data/collection/**/*
+!database/qdrant_data/collection/**/*.sqlite
+database/.indexer_checkpoint.json

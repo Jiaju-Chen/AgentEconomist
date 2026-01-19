@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "ai-economist-parameter-server": {
+      "command": "python",
+      "args": [
+        "agentsociety_ecosim/mcp_server/server_fastmcp.py"
+      ],
+      "cwd": ".",
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "MCP_MODE": "1"
+      }
+    }
+  }
+}
+

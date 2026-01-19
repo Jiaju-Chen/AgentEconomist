@@ -1,0 +1,21 @@
+# 低税收场景配置
+# 用于测试低税收（市场导向）对经济的影响
+
+# ==================== 税收政策 ====================
+tax_policy:
+  income_tax_rate: 0.15          # 降低个人所得税率到15%
+  vat_rate: 0.10                 # 降低增值税率到10%
+  corporate_tax_rate: 0.20       # 降低企业所得税率到20%
+
+# ==================== 再分配政策 ====================
+redistribution:
+  strategy: "none"               # 不进行再分配（纯市场机制）
+  poverty_weight: 0.0
+  unemployment_weight: 0.0
+  family_size_weight: 0.0
+
+# ==================== 劳动力市场 ====================
+labor_market:
+  enable_dismissal: true         # 允许自由裁员
+  dismissal_rate: 0.15           # 提高裁员率
+

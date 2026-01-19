@@ -1,0 +1,28 @@
+# 经济危机场景配置
+# 模拟经济危机条件下的参数设置
+
+# ==================== 劳动力市场 ====================
+labor_market:
+  dismissal_rate: 0.25           # 高裁员率
+  enable_dismissal: true
+  unemployment_threshold: 0.6    # 提高失业率容忍阈值
+  enable_dynamic_job_posting: true
+  first_month_job_rate: 0.5      # 减少初始工作发布
+
+# ==================== 生产参数 ====================
+production:
+  labor_productivity_factor: 70.0    # 降低劳动生产率
+  profit_to_production_ratio: 0.5    # 降低利润转化为生产的比例
+  min_production_per_product: 3.0    # 降低最小生产量
+
+# ==================== 市场参数 ====================
+market:
+  price_adjustment_rate: 0.2         # 提高价格调整速度（市场波动大）
+  inherent_market_consumption_rate: 0.4  # 降低固有市场消费
+
+# ==================== 再分配政策 ====================
+redistribution:
+  strategy: "progressive"            # 启动紧急再分配
+  poverty_weight: 0.6                # 大幅提高贫困权重
+  unemployment_weight: 0.4           # 大幅提高失业权重
+

@@ -1,0 +1,9 @@
+{
+  "python_version": "3.12",
+  "dependencies": ["../../AgentEconomist"],
+  "package_manager": "uv",
+  "graphs": {
+    "economist_agent": "../../AgentEconomist/economist_agent.py:graph"
+  },
+  "env": "../../AgentEconomist/.env"
+}

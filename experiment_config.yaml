@@ -1,0 +1,159 @@
+experiment_info:
+  name: "baseline_experiment"
+  description: "基准实验配置，使用默认参数"
+  created_date: "2025-11-05"
+  author: ""
+  tags: ["baseline", "default"]
+  notes: ""
+
+# ========== 税收政策参数 ==========
+tax_policy:
+  # 个人所得税率 (范围: 0.0-0.9)
+  income_tax_rate: 0.45
+  
+  # 增值税/消费税率 (范围: 0.0-0.5)
+  vat_rate: 0.20
+  
+  # 企业所得税率 (范围: 0.0-0.7)
+  corporate_tax_rate: 0.42
+
+# ========== 劳动力市场参数 ==========
+labor_market:
+  # 月度辞退率 (范围: 0.0-0.5)
+  dismissal_rate: 0.1
+  
+  # 是否启用辞退功能
+  enable_dismissal: true
+  
+  # 触发招聘的失业率阈值 (范围: 0.1-0.8)
+  unemployment_threshold: 0.4
+  
+  # 是否根据失业率动态发布工作
+  enable_dynamic_job_posting: true
+  
+  # 第一个月发布工作比例 (范围: 0.5-1.0)
+  first_month_job_rate: 0.9
+  
+  # 工作发布倍数（基于失业人数） (范围: 0.05-0.3)
+  job_posting_multiplier: 0.1
+
+# ========== 生产参数 ==========
+production:
+  # 全要素生产率（TFP）/基础效率因子 (范围: 10.0-1000.0)
+  labor_productivity_factor: 100.0
+  
+  # 劳动力弹性系数（柯布-道格拉斯生产函数参数） (范围: 0.3-1.0)
+  labor_elasticity: 0.7
+  
+  # 利润转化为生产预算的比例 (范围: 0.3-1.0)
+  profit_to_production_ratio: 0.7
+  
+  # 每个商品最小生产量 (范围: 1.0-20.0)
+  min_production_per_product: 5.0
+
+# ========== 市场参数 ==========
+market:
+  # 商品价格调整速率 (范围: 0.0-0.5)
+  price_adjustment_rate: 0.1
+  
+  # 固有市场消耗率（每月消耗库存商品的比例） (范围: 0.0-1.0)
+  inherent_market_consumption_rate: 0.65
+  
+  # 是否启用固有市场消耗机制
+  enable_inherent_market: true
+  
+  # 固有市场是否优先消耗新生产的商品
+  inherent_market_focus_new_products: true
+
+# ========== 系统规模参数 ==========
+system_scale:
+  # 家庭数量 (范围: 10-1000)
+  num_households: 100
+  
+  # 仿真月数 (范围: 1-120)
+  num_iterations: 12
+  
+  # 每个类别最小商品数量 (范围: 5-100)
+  min_per_cat: 20
+  
+  # 商品数量倍数 (范围: 5-50)
+  multiplier: 10
+
+# ========== 再分配政策参数 ==========
+redistribution:
+  # 再分配策略类型 (可选值: none, equal, income_proportional, poverty_focused, unemployment_focused, family_size, mixed)
+  redistribution_strategy: "none"
+  
+  # 贫困权重（混合策略中） (范围: 0.0-1.0)
+  redistribution_poverty_weight: 0.3
+  
+  # 失业权重（混合策略中） (范围: 0.0-1.0)
+  redistribution_unemployment_weight: 0.2
+  
+  # 家庭规模权重（混合策略中） (范围: 0.0-1.0)
+  redistribution_family_size_weight: 0.1
+
+# ========== 性能参数 ==========
+performance:
+  # LLM最大并发请求数 (范围: 100-2000)
+  max_llm_concurrent: 600
+  
+  # 最大并发任务数 (范围: 50-1000)
+  max_concurrent_tasks: 300
+  
+  # 企业处理最大并发数 (范围: 10-200)
+  max_firm_concurrent: 50
+  
+  # 是否使用批量预算分配（实验性功能）
+  use_batch_budget_allocation: false
+  
+  # 批量处理的家庭数量 (范围: 5-50)
+  batch_size: 10
+  
+  # 批量LLM请求超时时间（秒） (范围: 60-600)
+  batch_llm_timeout: 120
+
+# ========== 监控参数 ==========
+monitoring:
+  # 是否启用实时监控
+  enable_monitoring: false
+  
+  # 监控采样间隔（秒） (范围: 1.0-60.0)
+  monitor_interval: 5.0
+
+# ========== 实验干预 ==========
+experiment_intervention:
+  # 实验干预类型 (可选值: none, tax_policy, labor_market, production, market, system_scale, redistribution, performance, monitoring)
+  intervention_type: "none"
+  
+  # 实验干预参数
+  intervention_parameters: {}
+
+# ========== 实验元数据 ==========
+metadata:
+  # 预期研究问题
+  research_question: ""
+  
+  # 假设
+  hypothesis: ""
+  
+  # 预期结果
+  expected_outcome: ""
+  
+  # 实验状态 (planned/running/completed/failed)
+  status: "planned"
+  
+  # 运行时间记录
+  runtime:
+    start_time: null
+    end_time: null
+    duration_seconds: null
+  
+  # 结果摘要
+  results:
+    final_unemployment_rate: null
+    final_gini_coefficient: null
+    average_household_income: null
+    government_revenue: null
+    notes: ""
+

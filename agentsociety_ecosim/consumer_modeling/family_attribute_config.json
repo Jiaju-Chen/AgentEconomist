@@ -1,0 +1,86 @@
+{
+  "system_version": "4.0",
+  "description": "新属性系统配置 - 食物月度清零 + 非食物社会比较",
+  "system_version": "4.0",
+  "description": "新属性系统配置 - 食物月度清零 + 非食物社会比较",
+  
+  "product_attribute_file": "household_data/averaged_mapping_ordered.json",
+  "output_dir": "output",
+  
+  "nutrition_mode": "monthly_reset",
+  
+  "nutrition_consumption": {
+    "description": "营养月度消耗标准（单人）",
+    "carbohydrate_g_per_month": 9000,
+    "protein_g_per_month": 1800,
+    "fat_g_per_month": 2100,
+    "water_g_per_month": 15000,
+    "vitamin_decay_per_month": 300,
+    "mineral_decay_per_month": 300
+  },
+  
+  "nutrition_reference": {
+    "description": "营养参考数据配置",
+    "history_months": 6,
+    "deficit_alert_threshold": 3,
+    "critical_satisfaction_rate": 50
+  },
+  
+  "life_quality_reference": {
+    "description": "生活品质参考数据配置（v4.0新增：社会比较系统）",
+    "history_months": 6,
+    "min_families_for_comparison": 3,
+    "supply_to_score_multiplier": 10,
+    "water_g_per_month": 15000,
+    "vitamin_decay_per_month": 300,
+    "mineral_decay_per_month": 300
+  },
+  
+  "nutrition_reference": {
+    "description": "营养参考数据配置",
+    "history_months": 6,
+    "deficit_alert_threshold": 3,
+    "critical_satisfaction_rate": 50
+  },
+  
+  "life_quality_reference": {
+    "description": "生活品质参考数据配置（v4.0新增：社会比较系统）",
+    "history_months": 6,
+    "min_families_for_comparison": 3,
+    "supply_to_score_multiplier": 10
+  },
+  
+  "life_quality_decay": {
+    "description": "生活品质月度衰减（单人）- v4.0已废弃，改用社会比较",
+    "functional_satisfaction": 1.2,
+    "aesthetic_satisfaction": 1.0,
+    "symbolic_satisfaction": 0.6,
+    "social_satisfaction": 0.8,
+    "growth_satisfaction": 0.5
+  },
+  
+  "family_size_coefficients": {
+    "description": "家庭规模系数（共享效应）",
+    "1": 1.0,
+    "2": 0.85,
+    "3": 0.75,
+    "4": 0.70,
+    "5": 0.65,
+    "6+": 0.60
+  },
+  
+  "satisfaction_limits": {
+    "description": "满足度上限设置",
+    "max_functional_satisfaction": 100,
+    "max_aesthetic_satisfaction": 100,
+    "max_symbolic_satisfaction": 100,
+    "max_social_satisfaction": 100,
+    "max_growth_satisfaction": 100
+  },
+  
+  "file_settings": {
+    "encoding": "utf-8",
+    "indent": 2,
+    "float_precision": 2
+  }
+}

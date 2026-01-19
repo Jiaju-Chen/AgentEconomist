@@ -1,0 +1,22 @@
+[Unit]
+Description=Design Agent Streamlit Web Service
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/project/agentsociety-ecosim/economist
+Environment="PATH=/root/miniconda3/envs/ecosim/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+ExecStart=/root/project/agentsociety-ecosim/economist/run_streamlit.sh
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+
+

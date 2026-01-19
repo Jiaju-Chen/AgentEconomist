@@ -1,0 +1,64 @@
+tax_policy:
+  income_tax_rate: 0.225
+  vat_rate: 0.08
+  corporate_tax_rate: 0.21
+
+labor_market:
+  dismissal_rate: 0.1
+  enable_dismissal: true
+  unemployment_threshold: 0.4
+  enable_dynamic_job_posting: true
+  first_month_job_rate: 0.9
+  job_posting_multiplier: 0.1
+
+production:
+  labor_productivity_factor: 100.0
+  labor_elasticity: 0.7
+  profit_to_production_ratio: 0.7
+  min_production_per_product: 5.0
+  base_production_rate: 100.0
+  high_demand_multiplier: 1.5
+  low_demand_multiplier: 0.7
+
+market:
+  min_per_cat: 20
+  multiplier: 12
+  price_adjustment_rate: 0.1
+  enable_inherent_market: true
+  inherent_market_consumption_rate: 0.65
+  inherent_market_focus_new_products: true
+
+system_scale:
+  num_households: 5
+  num_iterations: 5
+  random_state: 42
+
+redistribution:
+  redistribution_strategy: none
+  redistribution_poverty_weight: 0.3
+  redistribution_unemployment_weight: 0.2
+  redistribution_family_size_weight: 0.1
+
+performance:
+  max_concurrent_tasks: 300
+  max_llm_concurrent: 600
+  max_firm_concurrent: 50
+  use_batch_budget_allocation: false
+  batch_size: 10
+  batch_llm_timeout: 120
+
+monitoring:
+  enable_monitoring: false
+  monitor_interval: 5.0
+
+innovation:
+  enable_innovation_module: true
+  innovation_gamma: 1.2
+  policy_encourage_innovation: false
+  innovation_lambda: 0.7
+  innovation_concavity_beta: 0.6
+  innovation_research_share: 0.1
+
+experiment_name: exp_5h_5m_20260104_105605
+experiment_output_dir: /root/project/output/exp_5h_5m_20260104_105605
+

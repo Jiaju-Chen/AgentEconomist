@@ -1,0 +1,38 @@
+{
+  "evaluation_config": {
+    "description": "消费者模型评估系统配置",
+    "data_paths": {
+      "output_dir": "consumer_modeling/output",
+      "family_data_path": "consumer_modeling/household_data/PSID/extracted_data/processed_data/integrated_psid_families_data.json"
+    },
+    "evaluation_metrics": {
+      "budget_consistency": {
+        "enabled": true,
+        "weight": 0.3,
+        "description": "预算分配与历史消费的一致性"
+      },
+      "product_profile_consistency": {
+        "enabled": true,
+        "weight": 0.3,
+        "description": "商品选择与家庭画像的一致性"
+      },
+      "product_diversity": {
+        "enabled": true,
+        "weight": 0.25,
+        "description": "商品多样性评估"
+      },
+      "family_heterogeneity": {
+        "enabled": true,
+        "weight": 0.15,
+        "description": "家庭间异质性评估"
+      }
+    },
+    "diversity_weights": {
+      "category_diversity": 0.5,
+      "price_coverage": 0.3,
+      "quantity_diversity": 0.2
+    },
+    "historical_years": 6,
+    "max_representative_products": 20
+  }
+}

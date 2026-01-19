@@ -1,0 +1,9 @@
+{
+    "mcpServers": {
+        "ai-economist": {
+            "url": "http://localhost:8000/mcp",
+            "transport": "streamable"
+        }
+    }
+}
+

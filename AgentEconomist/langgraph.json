@@ -1,0 +1,8 @@
+{
+  "python_version": "3.11",
+  "dependencies": ["."],
+  "graphs": {
+    "economist_agent": "AgentEconomist.graph.agent:build_economist_graph"
+  },
+  "env": ".env"
+}

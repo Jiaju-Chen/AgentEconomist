@@ -1,0 +1,48 @@
+[tool.poetry]
+name = "agentsociety-ecosim"
+version = "0.1.0"
+description = "AgentSociety Economic Simulation - AI-powered economic system simulation platform"
+authors = ["AgentSociety Contributors"]
+readme = "README.md"
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+agentscope = "*"
+pyyaml = "^6.0"
+ray = "^2.0.0"
+qdrant-client = "^1.7.0"
+transformers = "^4.35.0"
+torch = "^2.0.0"
+sentence-transformers = "^2.2.0"
+pandas = "^2.0.0"
+numpy = "^1.24.0"
+tqdm = "^4.65.0"
+streamlit = {version = "^1.28.0", optional = true}
+plotly = {version = "^5.17.0", optional = true}
+fastmcp = {version = "^2.0.0", optional = true}
+mcp = {version = "^1.0.0", optional = true}
+
+[tool.poetry.extras]
+ui = ["streamlit", "plotly"]
+mcp = ["fastmcp", "mcp"]
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.0.0"
+pytest-asyncio = "^0.21.0"
+black = "^23.0.0"
+isort = "^5.12.0"
+mypy = "^1.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+target-version = ['py39', 'py310', 'py311']
+
+[tool.isort]
+profile = "black"
+line_length = 100
+

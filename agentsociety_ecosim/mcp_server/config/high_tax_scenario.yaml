@@ -1,0 +1,18 @@
+# 高税收场景配置
+# 用于测试高税收对经济的影响
+
+# ==================== 税收政策 ====================
+tax_policy:
+  income_tax_rate: 0.55          # 提高个人所得税率到55%
+  vat_rate: 0.30                 # 提高增值税率到30%
+  corporate_tax_rate: 0.50       # 提高企业所得税率到50%
+
+# ==================== 再分配政策 ====================
+redistribution:
+  strategy: "progressive"        # 使用累进再分配策略
+  poverty_weight: 0.5            # 增加贫困权重
+  unemployment_weight: 0.3       # 增加失业权重
+  family_size_weight: 0.2        # 增加家庭规模权重
+
+# 其他参数继承自 default.yaml
+
