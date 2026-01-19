@@ -162,10 +162,23 @@ def _extract_key_metrics(data_dir: Path) -> Dict[str, Any]:
             with open(perf_path, 'r') as f:
                 perf_data = json.load(f)
             
-            metrics["performance"] = {
-                "total_time": perf_data.get("total_time", 0),
-                "avg_iteration_time": perf_data.get("avg_iteration_time", 0),
-            }
+            # 鲁棒性检查：处理 dict 或 list 格式
+            if isinstance(perf_data, dict):
+                metrics["performance"] = {
+                    "total_time": perf_data.get("total_time", 0),
+                    "avg_iteration_time": perf_data.get("avg_iteration_time", 0),
+                }
+            elif isinstance(perf_data, list) and len(perf_data) > 0:
+                # 如果是 list，计算总时间和平均操作时间
+                durations = [item.get("duration", 0) for item in perf_data if isinstance(item, dict) and "duration" in item]
+                if durations:
+                    metrics["performance"] = {
+                        "total_time": sum(durations),
+                        "avg_operation_time": statistics.mean(durations),
+                        "total_operations": len(durations),
+                        "max_operation_time": max(durations),
+                        "min_operation_time": min(durations),
+                    }
         
         # 5. 读取创新配置（如果存在）
         innovation_path = data_dir / "innovation_configs.json"
@@ -173,12 +186,23 @@ def _extract_key_metrics(data_dir: Path) -> Dict[str, Any]:
             with open(innovation_path, 'r') as f:
                 innovation_data = json.load(f)
             
-            if innovation_data and "simulation_config" in innovation_data:
-                sim_config = innovation_data["simulation_config"]
-                metrics["innovation_config"] = {
-                    "innovation_enabled": sim_config.get("innovation_enabled", False),
-                    "total_innovation_events": innovation_data.get("total_innovation_events", 0),
-                }
+            # 鲁棒性检查：处理不同的数据格式
+            if innovation_data:
+                # 格式1：顶层有 simulation_config 键
+                if "simulation_config" in innovation_data:
+                    sim_config = innovation_data["simulation_config"]
+                    metrics["innovation_config"] = {
+                        "innovation_enabled": sim_config.get("innovation_enabled", False),
+                        "total_innovation_events": innovation_data.get("total_innovation_events", 0),
+                    }
+                # 格式2：以公司ID为键的字典（统计创新配置的公司数量）
+                elif isinstance(innovation_data, dict):
+                    # 统计有创新配置的公司数量
+                    total_firms_with_innovation = len(innovation_data)
+                    metrics["innovation_config"] = {
+                        "total_firms_with_innovation": total_firms_with_innovation,
+                        "innovation_enabled": total_firms_with_innovation > 0,
+                    }
     
     except Exception as e:
         print(f"Warning: Failed to extract some metrics: {e}")
