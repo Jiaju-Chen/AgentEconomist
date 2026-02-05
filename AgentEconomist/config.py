@@ -6,7 +6,6 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Load .env file if exists
 load_dotenv()
 
 
@@ -18,11 +17,11 @@ class Config:
     PROJECT_ROOT = _AGENT_DIR.parent
     
     SIMULATION_BINARY = PROJECT_ROOT / os.getenv("SIMULATION_BINARY", "agentsociety_ecosim/center/EcoCenter")
-    DEFAULT_CONFIG_TEMPLATE = PROJECT_ROOT / os.getenv("DEFAULT_CONFIG_TEMPLATE", "default.yaml")
+    DEFAULT_CONFIG_TEMPLATE = PROJECT_ROOT / "agentsociety_ecosim" / os.getenv("DEFAULT_CONFIG_TEMPLATE", "default.yaml")
     
     # API Configuration
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") or os.getenv("DASHSCOPE_API_KEY", "")
-    BASE_URL = os.getenv("BASE_URL", "http://35.220.164.252:3888/v1/")
+    BASE_URL = os.getenv("ECONOMIST_BASE_URL", "http://35.220.164.252:3888/v1/")
     
     # Model Configuration
     LLM_MODEL = os.getenv("ECONOMIST_LLM_MODEL", "gpt-5")

@@ -147,11 +147,10 @@ def main():
         data_dir=args.data_dir,
     )
     
-    # Qdrant 配置 - 使用远程服务器（Docker 部署）
+    # Qdrant 配置 - 使用本地模式（本地文件存储）
     config.qdrant.collection_name = args.collection
-    config.qdrant.mode = "remote"
-    config.qdrant.host = "localhost"
-    config.qdrant.port = 6333
+    config.qdrant.mode = "local"  # 改为本地模式
+    config.qdrant.local_path = args.qdrant_path  # 使用命令行参数指定的路径
     
     # Chunking 配置：启用 only_intro_sections（每个论文一个文档：abstract + introduction）
     config.chunking.only_intro_sections = True
@@ -219,11 +218,14 @@ def main():
         logger.info(f"  速度: {stats.indexed_documents / stats.elapsed_seconds:.1f} docs/s")
         logger.info("=" * 60)
         
-        # 打印索引统计
+        # 打印索引统计（如果失败不影响整体流程）
+        try:
         index_stats = indexer.get_index_stats()
         logger.info("索引统计:")
         for key, value in index_stats.items():
             logger.info(f"  {key}: {value}")
+        except Exception as e:
+            logger.warning(f"获取索引统计失败（不影响索引结果）: {e}")
         
     except KeyboardInterrupt:
         logger.info("用户中断")

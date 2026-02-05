@@ -15,14 +15,23 @@ from ..utils.response import extract_manifest_path
 def create_init_node(system_prompt: str):
     """创建初始化节点"""
     def init_node(state: AgentState):
-        """初始化节点：添加系统提示"""
+        """初始化节点：添加系统提示，并清理中断残留的状态"""
         messages = state.get("messages", [])
+        updates = {}
+        
         # 如果还没有系统消息，则插入系统提示
         if not any(isinstance(m, SystemMessage) for m in messages):
-            return {
-                "messages": [SystemMessage(content=system_prompt), *messages]
-            }
-        return {}
+            updates["messages"] = [SystemMessage(content=system_prompt), *messages]
+        
+        # 重要：检测到新的用户消息时，清除可能残留的 running_tool_name
+        # 这样可以避免用户在工具执行期间点击暂停时，工具名称一直显示的 bug
+        if messages and isinstance(messages[-1], HumanMessage):
+            current_tool = state.get("running_tool_name")
+            if current_tool:
+                # 有新的用户消息，清除之前可能因中断而残留的工具名
+                updates["running_tool_name"] = None
+        
+        return updates if updates else {}
     return init_node
 
 
@@ -80,8 +89,18 @@ def create_call_model_node(llm_with_tools, system_prompt: str):
         # 调用模型
         response = llm_with_tools.invoke(final_msgs)
         
-        # 只追加模型回复
-        return {"messages": [response]}
+        # 检测工具调用，设置 running_tool_name
+        tool_name = None
+        if hasattr(response, 'tool_calls') and response.tool_calls:
+            tool_name = response.tool_calls[0]['name']
+        
+        # 追加模型回复和工具名称
+        # 注意：这里会清除之前的 running_tool_name（如果没有新的工具调用）
+        # 这样即使中断发生，下次调用时也会清理掉残留的工具名
+        return {
+            "messages": [response],
+            "running_tool_name": tool_name  # None 或新的工具名
+        }
     
     return call_model
 
@@ -131,12 +150,15 @@ def create_update_fs_state_node():
             return {
                 "fs_state": fs_state,
                 "manifest_path": manifest_path,
-                "last_tool_output": last_tool_output
+                "last_tool_output": last_tool_output,
+                "running_tool_name": None  # 工具执行完毕，清空
             }
         except Exception as e:
             print(f"Warning: Failed to update fs_state from manifest {manifest_path}: {e}")
             import traceback
             traceback.print_exc()
-            return {}
+            return {
+                "running_tool_name": None  # 即使失败也清空
+            }
     
     return update_fs_state_node

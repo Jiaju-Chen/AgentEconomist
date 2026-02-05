@@ -1,7 +1,7 @@
 {
   "mcpServers": {
     "ai-economist-parameter-server": {
-      "command": "/root/miniconda3/envs/ecosim/bin/python",
+      "command": "/root/miniconda3/envs/economist/bin/python",
       "args": [
         "agentsociety_ecosim/mcp_server/server_fastmcp.py"
       ],

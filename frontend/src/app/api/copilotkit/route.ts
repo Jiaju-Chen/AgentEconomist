@@ -7,37 +7,30 @@
 
 import {
   CopilotRuntime,
+  ExperimentalEmptyAdapter,
   copilotRuntimeNextJSAppRouterEndpoint,
-  langGraphPlatformEndpoint,
 } from "@copilotkit/runtime";
+import { LangGraphAgent } from "@copilotkit/runtime/langgraph";
+import { NextRequest } from "next/server";
 
-/**
- * LangGraph 后端配置
- * 
- * 注意：使用 graphId（不是 assistantId）来指定具体的 graph
- */
-const serviceAdapter = langGraphPlatformEndpoint({
-  deploymentUrl: process.env.LANGGRAPH_API_URL || "http://127.0.0.1:2024",
-  graphId: "economist_agent", // 使用 graphId 指定 graph
+// 1. 使用 ExperimentalEmptyAdapter（用于单 agent 场景）
+const serviceAdapter = new ExperimentalEmptyAdapter();
+
+// 2. 创建 CopilotRuntime 实例并配置 LangGraph Agent
+const runtime = new CopilotRuntime({
+  agents: {
+    economist_agent: new LangGraphAgent({
+      deploymentUrl:
+        process.env.LANGGRAPH_API_URL || "http://127.0.0.1:8123",
+      graphId: "economist_agent",
+      langsmithApiKey: process.env.LANGSMITH_API_KEY || "",
+    }),
+  },
 });
 
-/**
- * 创建 CopilotRuntime 实例
- * 
- * 当使用 langGraphPlatformEndpoint 时，
- * LangGraph 会处理所有的模型调用和工具执行
- */
-const runtime = new CopilotRuntime();
-
-/**
- * POST /api/copilotkit
- * 
- * 接收前端的聊天请求，转发到 LangGraph Agent
- */
-export const POST = async (req: Request) => {
-  // Debug logging
-  console.log("[CopilotKit Route] Incoming request:", req.url);
-  console.log("[CopilotKit Route] Method:", req.method);
+// 3. 构建 Next.js API 路由处理 CopilotKit 请求
+export const POST = async (req: NextRequest) => {
+  console.log("[CopilotKit Route] Incoming request");
   
   const { handleRequest } = copilotRuntimeNextJSAppRouterEndpoint({
     runtime,
@@ -45,12 +38,5 @@ export const POST = async (req: Request) => {
     endpoint: "/api/copilotkit",
   });
 
-  try {
-    const response = await handleRequest(req);
-    console.log("[CopilotKit Route] Response status:", response.status);
-    return response;
-  } catch (error) {
-    console.error("[CopilotKit Route] Error:", error);
-    throw error;
-  }
+  return handleRequest(req);
 };

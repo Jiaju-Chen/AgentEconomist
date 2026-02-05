@@ -16,7 +16,7 @@ load_dotenv()
 import asyncio
 import time
 import json
-import psutil
+# import psutil
 import ray
 import sys
 import os
@@ -67,16 +67,9 @@ else:
 tokenizer = AutoTokenizer.from_pretrained(os.getenv("MODEL_PATH"))
 model = AutoModel.from_pretrained(os.getenv("MODEL_PATH")).to(device)
 
-client = QdrantClient(url="http://localhost:6333")
-collection_name = "part_products"  
-# 删除 重新创建
-existing_collections = [c.name for c in client.get_collections().collections]
-if collection_name in existing_collections:
-    client.delete_collection(collection_name)
-client.create_collection(
-    collection_name=collection_name,
-    vectors_config=VectorParams(size=384, distance=Distance.COSINE)
-)
+# 注意：Qdrant 客户端由 ProductMarket Actor 管理，主进程不需要初始化
+# 如果需要在主进程中使用向量搜索，请使用远程 Qdrant 服务器
+print("Using local Qdrant storage: /home/chenjiaju/AgentEconomist/agentsociety_ecosim/data/qdrant_data")
 
 # 设置日志
 logger = setup_global_logger(name="economic_simulation", log_dir="logs", level="INFO")
@@ -626,10 +619,10 @@ class EconomicSimulation:
                     
                     await firm.initialize()
 
-                    # 加载企业产品
+                    # 加载企业产品（不再需要 client 参数，由 ProductMarket Actor 管理）
                     await load_products_firm(firm, firm_products, firm2product, 
                                      self.config.amount, self.economic_center, self.product_market, 
-                                     model, tokenizer, client)  
+                                     model, tokenizer)  
                     
                     return firm
                 except Exception as e:

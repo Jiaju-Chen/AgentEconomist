@@ -9,6 +9,8 @@ from typing import List, Dict, Any, Optional, Union
 from dataclasses import dataclass
 import numpy as np
 from pathlib import Path
+import hashlib
+from uuid import uuid5, NAMESPACE_DNS
 
 from .config import QdrantConfig
 from .document_loader import PaperDocument
@@ -149,8 +151,13 @@ class QdrantVectorStore:
         
         points = []
         for doc, embedding in zip(documents, embeddings):
+            # 使用 UUID5 生成确定性 ID（基于 doc_id），避免哈希冲突
+            # UUID5 是确定性哈希，相同输入产生相同输出，冲突概率极低（2^-122）
+            doc_uuid = uuid5(NAMESPACE_DNS, doc.doc_id)
+            point_id = doc_uuid.int % (2**63)  # 转换为 64 位整数
+            
             point = PointStruct(
-                id=hash(doc.doc_id) % (2**63),  # 转换为整数 ID
+                id=point_id,
                 vector=embedding.tolist(),
                 payload=doc.to_dict(),
             )
@@ -235,20 +242,26 @@ class QdrantVectorStore:
             if must_conditions:
                 qdrant_filter = Filter(must=must_conditions)
         
-        # 执行检索
-        results = client.search(
+        # 执行检索（使用新版本 API：query_points 替代 search）
+        # query_points 可以直接接受向量列表作为 query 参数
+        response = client.query_points(
             collection_name=self.config.collection_name,
-            query_vector=query_embedding.tolist(),
+            query=query_embedding.tolist(),  # 直接传入向量列表
+            query_filter=qdrant_filter,
             limit=top_k,
             score_threshold=score_threshold,
-            query_filter=qdrant_filter,
         )
+        
+        # 转换响应格式（query_points 返回 QueryResponse，需要访问 points）
+        results = response.points if hasattr(response, 'points') else []
         
         # 转换结果
         search_results = []
         for hit in results:
             doc = PaperDocument.from_dict(hit.payload)
-            search_results.append(SearchResult(document=doc, score=hit.score))
+            # query_points 返回的 ScoredPoint 中，score 是 float 值
+            score = getattr(hit, 'score', 0.0)
+            search_results.append(SearchResult(document=doc, score=float(score)))
         
         return search_results
     
@@ -327,11 +340,17 @@ class QdrantVectorStore:
         
         info = client.get_collection(self.config.collection_name)
         
+        # 兼容不同版本的 Qdrant API
+        # 新版本使用 points_count 和 indexed_vectors_count
+        # 旧版本使用 vectors_count
+        points_count = info.points_count
+        vectors_count = getattr(info, 'indexed_vectors_count', None) or getattr(info, 'vectors_count', points_count)
+        
         return {
             "name": self.config.collection_name,
-            "vectors_count": info.vectors_count,
-            "points_count": info.points_count,
-            "status": info.status.name,
+            "vectors_count": vectors_count,
+            "points_count": points_count,
+            "status": info.status.name if hasattr(info.status, 'name') else str(info.status),
             "vector_size": self.config.vector_size,
             "distance_metric": self.config.distance_metric,
         }

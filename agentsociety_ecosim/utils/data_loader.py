@@ -1,6 +1,14 @@
 # 添加当前文件夹到 Python 路径
 import sys
 import os
+from pathlib import Path
+
+# 确保工作目录在 agentsociety_ecosim/
+_CURRENT_FILE = Path(__file__).resolve()  # data_loader.py 的绝对路径
+_UTILS_DIR = _CURRENT_FILE.parent  # utils/
+_ECOSIM_DIR = _UTILS_DIR.parent  # agentsociety_ecosim/
+os.chdir(_ECOSIM_DIR)  # 切换到 agentsociety_ecosim/ 目录
+
 sys.path.append('.')
 # 添加上级文件夹到 Python 路径
 sys.path.append('..')
@@ -148,7 +156,10 @@ def load_products():
 def load_product_map():
     return pd.read_csv('data/firm2product.csv')
 
-async def load_products_firm(firm, products, map, amount_config, economic_center, product_market, model, tokenizer, client):
+async def load_products_firm(firm, products, map, amount_config, economic_center, product_market, model, tokenizer):
+    """
+    为企业加载商品（不再直接操作 Qdrant，由 ProductMarket 统一管理）
+    """
     id = firm.company_id
     product_firm = []
     logger.info(f"[ProductLoader] 开始注册企业 {id} 的商品，待处理 {len(products)} 条记录")
@@ -178,16 +189,31 @@ async def load_products_firm(firm, products, map, amount_config, economic_center
             #     f"| 分类:{product.classification} 价格:{product.price} 属性已附加:{bool(product.attributes)}"
             # )
     logger.info(f"[ProductLoader] 企业 {id} 商品注册完毕，总计 {len(product_firm)} 条有效商品")
+    
+    # 🚀 批量加载到 Qdrant（通过 ProductMarket Actor）
     if product_firm:
-        load_product_to_qdrant(model, tokenizer, client, product_firm)
+        await product_market.batch_load_to_qdrant.remote(product_firm)
 
 
 def load_product_to_qdrant(model, tokenizer, client, product_list):
+    """
+    批量加载商品向量到 Qdrant（使用批量 embedding 加速）
+    """
     collection_name = "part_products"
-    points = []
+    
+    # 🚀 批量处理：先收集所有文本
+    texts = []
     for product in product_list:
         text = ' '.join([product.name, product.brand, product.description or '', product.classification])
-        vector = embedding(text, tokenizer, model)
+        texts.append(text)
+    
+    # 🚀 批量计算所有向量（加速 5-10 倍）
+    from agentsociety_ecosim.utils.embedding import batch_embedding
+    vectors = batch_embedding(texts, tokenizer, model, batch_size=32)
+    
+    # 构建 Qdrant points
+    points = []
+    for product, vector in zip(product_list, vectors):
         payload = {
             "name": product.name,
             "Uniq Id": product.product_id,
@@ -204,7 +230,9 @@ def load_product_to_qdrant(model, tokenizer, client, product_list):
         unique_id = str(uuid5(NAMESPACE_DNS, composite_string))
         points.append(PointStruct(id=unique_id, vector=vector, payload=payload))
     
+    # 批量插入 Qdrant
     client.upsert(collection_name=collection_name, points=points)
+    logger.info(f"[Qdrant] 批量插入 {len(points)} 个商品向量")
 
 
 def allocate_products(products, firms_df, random_state):

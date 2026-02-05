@@ -10,7 +10,7 @@
 
 1️⃣ 命令行模式（测试用）
    
-   conda activate ecosim
+   conda activate economist
    cd /root/project/agentsociety-ecosim/AgentEconomist
    python economist_agent.py
    

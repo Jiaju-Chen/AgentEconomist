@@ -92,7 +92,10 @@ const ConfigDiffComponent = ({ configurations }: ConfigDiffProps) => {
       
       for (const config of configurations) {
         try {
-          const response = await fetch(config.url);
+          // Use API route to fetch file content
+          // Add timestamp to bypass browser cache and always get the latest version
+          const apiUrl = `/api/files?path=${encodeURIComponent(config.url)}&t=${Date.now()}`;
+          const response = await fetch(apiUrl);
           if (response.ok) {
             contents[config.url] = await response.text();
           } else {

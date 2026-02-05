@@ -20,10 +20,13 @@ logger = logging.getLogger(__name__)
 HF_MIRROR = os.getenv("HF_ENDPOINT", "https://hf-mirror.com")
 os.environ["HF_ENDPOINT"] = HF_MIRROR
 
-# 本地缓存优先路径（ModelScope 下载）
+# 本地缓存优先路径（项目本地模型目录）
+# 基于 database/knowledge_base/embeddings.py 的相对路径
+from pathlib import Path
+_PROJECT_ROOT = Path(__file__).parent.parent.parent  # 回到项目根目录
 LOCAL_MODEL_PATHS = {
-    "sentence-transformers/allenai-specter": "/root/.cache/modelscope/sentence-transformers/allenai-specter",
-    "allenai/specter2": "/root/.cache/modelscope/sentence-transformers/allenai-specter",
+    "sentence-transformers/allenai-specter": str(_PROJECT_ROOT / "model" / "allenai-specter"),
+    "allenai/specter2": str(_PROJECT_ROOT / "model" / "allenai-specter"),
 }
 
 
@@ -213,10 +216,11 @@ class FallbackEmbeddings:
     使用 sentence-transformers 的通用模型作为备选。
     """
     
-    # ModelScope 缓存路径映射
+    # 项目本地模型路径映射（使用相对路径）
+    _PROJECT_ROOT = Path(__file__).parent.parent.parent  # 回到项目根目录
     LOCAL_MODEL_PATHS = {
-        "all-MiniLM-L6-v2": "/root/.cache/modelscope/sentence-transformers/all-MiniLM-L6-v2",
-        "sentence-transformers/all-MiniLM-L6-v2": "/root/.cache/modelscope/sentence-transformers/all-MiniLM-L6-v2",
+        "all-MiniLM-L6-v2": str(_PROJECT_ROOT / "model" / "all-MiniLM-L6-v2"),
+        "sentence-transformers/all-MiniLM-L6-v2": str(_PROJECT_ROOT / "model" / "all-MiniLM-L6-v2"),
     }
     
     def __init__(self, model_name: str = "all-MiniLM-L6-v2"):

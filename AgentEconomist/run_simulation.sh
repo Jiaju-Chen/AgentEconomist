@@ -6,7 +6,7 @@ AGENT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(cd "$AGENT_DIR/.." && pwd)"
 
 # 实际的仿真脚本在项目根目录
-SIM_SCRIPT="$PROJECT_ROOT/run_sim_with_yaml.sh"
+SIM_SCRIPT="$PROJECT_ROOT/agentsociety_ecosim/run_sim_with_yaml.sh"
 
 # 确保仿真脚本可执行
 if [[ ! -x "$SIM_SCRIPT" ]]; then

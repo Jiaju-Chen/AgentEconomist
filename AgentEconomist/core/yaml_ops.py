@@ -35,7 +35,7 @@ def create_config_from_template(
     try:
         # Load default template
         project_root = get_project_root()
-        template_path = project_root / "default.yaml"
+        template_path = project_root / "agentsociety_ecosim" / "default.yaml"
         
         if not template_path.exists():
             return format_tool_output("error", f"Template not found: {template_path}")
@@ -190,3 +190,35 @@ def _ensure_experiment_metadata(data: Dict) -> Tuple[str, str]:
     data["experiment_output_dir"] = experiment_output_dir
     
     return experiment_name, experiment_output_dir
+
+
+def modify_existing_yaml(
+    yaml_path: str,
+    parameter_changes: Dict[str, Any]
+) -> None:
+    """
+    修改现有的 YAML 文件，更新指定参数。
+    
+    Args:
+        yaml_path: YAML 文件路径
+        parameter_changes: 参数修改字典（点号表示法，如 {"system_scale.num_iterations": 2}）
+    
+    Raises:
+        FileNotFoundError: 如果 YAML 文件不存在
+    """
+    # 加载现有 YAML
+    yaml_file = Path(yaml_path)
+    if not yaml_file.exists():
+        raise FileNotFoundError(f"YAML file not found: {yaml_path}")
+    
+    with open(yaml_file, 'r', encoding='utf-8') as f:
+        config = yaml.safe_load(f) or {}
+    
+    # 应用参数修改（使用现有的 _set_value 函数）
+    for param_path, new_value in parameter_changes.items():
+        tokens = _parse_path(param_path)
+        config = _set_value(config, tokens, new_value, create_missing=True)
+    
+    # 保存回文件
+    with open(yaml_file, 'w', encoding='utf-8') as f:
+        yaml.safe_dump(config, f, allow_unicode=True, sort_keys=False)

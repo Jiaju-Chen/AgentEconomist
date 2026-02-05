@@ -27,3 +27,7 @@ html {
 cpk-web-inspector {
   display: none !important;
 }
+
+.copilotKitMessageControlButton:nth-child(1) {
+  display: none !important;
+}

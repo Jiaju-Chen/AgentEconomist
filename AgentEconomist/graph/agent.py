@@ -42,14 +42,30 @@ def build_economist_graph():
             description="Get detailed information about a specific parameter."
         ),
         StructuredTool.from_function(
-            func=tools.init_experiment_manifest,
-            name="init_experiment_manifest",
-            description="Initialize experiment manifest with metadata."
+            func=tools.init_manifest,
+            name="init_manifest",
+            description="Initialize experiment directory and manifest. CALL THIS FIRST when user asks a research question!"
+        ),
+        StructuredTool.from_function(
+            func=tools.update_experiment_metadata,
+            name="update_experiment_metadata",
+            description="Update experiment metadata (name, description, hypothesis, etc.). Can be called multiple times."
         ),
         StructuredTool.from_function(
             func=tools.create_yaml_from_template,
             name="create_yaml_from_template",
             description="Create a YAML configuration file from template with modified parameters."
+        ),
+        StructuredTool.from_function(
+            func=tools.modify_yaml_parameters,
+            name="modify_yaml_parameters",
+            description=(
+                "Modify parameters for multiple configuration groups at once. "
+                "Use this when you need to change parameters in existing configs. "
+                "Pass group_names as comma-separated string (e.g. 'control,treatment'). "
+                "Example: modify_yaml_parameters(manifest_path='...', group_names='control,treatment', "
+                "parameter_changes='{\"system_scale.num_iterations\": 2}')"
+            )
         ),
         StructuredTool.from_function(
             func=tools.run_simulation,

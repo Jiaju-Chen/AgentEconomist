@@ -47,14 +47,8 @@ if not model_path:
 tokenizer = AutoTokenizer.from_pretrained(model_path)
 model = AutoModel.from_pretrained(model_path).to(device)
 
-client = QdrantClient(url="http://localhost:6333")
-collection_name = "all_products"
-
-if not client.get_collection(collection_name):
-    client.create_collection(
-        collection_name=collection_name,
-        vectors_config=VectorParams(size=384, distance=Distance.COSINE)
-    )
+# 注意：Qdrant 客户端由 ProductMarket Actor 管理，这里不需要初始化
+# 如果需要在主进程中使用向量搜索，请使用远程 Qdrant 服务器
 
 std_job = load_jobs()
 job_dis = load_job_dis()
@@ -236,21 +230,22 @@ async def main():
     await bank.initialize.remote()
     logger.info("Bank initialized with capital $10,000,000")
 
-    # Create Households according to laborhour
+    #Create Households according to laborhour
     products = load_products()
     firm2product = load_product_map()
+    
+    # 商品数量配置（食品 vs 非食品）
+    amount_config = {
+        'food_amount': 800,      # 食品初始库存（基于实际数据规模优化）
+        'non_food_amount': 400   # 非食品初始库存（基于实际数据规模优化）
+    }
 
     households = []
     households_dict = load_households()
     for key, values in households_dict.items():
         household_id = key
         labor_hours = load_lh(household_id, values)
-    households_dict = load_households()
-    for key, values in households_dict.items():
-        household_id = key
-        labor_hours = load_lh(household_id, values)
         household = Household(
-            household_id=household_id,
             household_id=household_id,
             economic_center=economic_center,
             labor_hour=labor_hours,
@@ -273,7 +268,7 @@ async def main():
     logger.info(f"Initialized {len(firms)} firms.")
     # print(f"Initialized {len(firms)} firms.")
     for firm in firms:
-        load_products_firm(firm, products, firm2product, economic_center, product_market, model, tokenizer, client)
+        await load_products_firm(firm, products, firm2product, amount_config, economic_center, product_market, model, tokenizer)
     logger.info("All firms and products initialized.")
     # print("All firms and products initialized.")
     await run_simulation(

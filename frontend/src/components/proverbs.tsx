@@ -70,10 +70,10 @@ export function ProverbsCard({ state, setState }: ProverbsCardProps) {
       hasResults,
     };
   }, [hasIdeas, hasConfig, hasResults]);
-  const showRunningTool = state.running_tool_name && state.running_tool_name.trim() !== "";
+  
   const titleText = hasFsState && state.fs_state.name && state.fs_state.name.trim() !== ""
     ? state.fs_state.name
-    : "Agent Ecoscientist";
+    : "AgentEconomist";
   const hasDescription = hasFsState && state.fs_state.description && state.fs_state.description.trim() !== "";
   const hasCreatedDate = hasFsState && state.fs_state.created_date && state.fs_state.created_date.trim() !== "";
 
@@ -124,47 +124,15 @@ export function ProverbsCard({ state, setState }: ProverbsCardProps) {
         </div>
       }
     >
-      {!hasFsState ? (
-        <div style={{ textAlign: "center", padding: "40px 20px" }}>
-          <Paragraph style={{ fontSize: "16px", color: "#666" }}>
-            Welcome to Agent Economist. Please describe the economics research question you would like to investigate.
-          </Paragraph>
-        </div>
-      ) : (
-        <>
-          {/* 状态区 */}
-          <div style={{ marginBottom: 16, padding: "12px", backgroundColor: "#f5f5f5", borderRadius: "4px" }}>
-            {state.fs_state.status && (
-              <div style={{ marginBottom: showRunningTool ? 8 : 0 }}>
-                <Text strong style={{ marginRight: 8 }}>Status: </Text>
-                <Tag
-                  color={
-                    state.fs_state.status === "pending"
-                      ? "default"
-                      : state.fs_state.status === "planning"
-                      ? "cyan"
-                      : state.fs_state.status === "running"
-                      ? "processing"
-                      : state.fs_state.status === "completed"
-                      ? "success"
-                      : state.fs_state.status === "failed"
-                      ? "error"
-                      : state.fs_state.status === "analysis_pending"
-                      ? "warning"
-                      : "default"
-                  }
-                >
-                  {state.fs_state.status}
-                </Tag>
-              </div>
-            )}
-            {showRunningTool && (
-              <div>
-                <Text strong style={{ marginRight: 8 }}>Running Tool: </Text>
-                <Tag color="processing">{state.running_tool_name}</Tag>
-              </div>
-            )}
-          </div>
+      <>
+        {/* 工具执行状态显示 */}
+        {state.running_tool_name && state.running_tool_name.trim() !== "" && (
+            <div style={{ marginBottom: 16, padding: "12px", backgroundColor: "#f5f5f5", borderRadius: "4px" }}>
+              <Text strong style={{ marginRight: 8 }}>Running Tool: </Text>
+              <Tag color="processing">{state.running_tool_name}</Tag>
+            </div>
+          )}
+          
           <Tabs
             activeKey={activeTab}
             onChange={setActiveTab}
@@ -244,22 +212,6 @@ export function ProverbsCard({ state, setState }: ProverbsCardProps) {
                                     </Text>
                                   </div>
                                 )}
-                                {item.core_finding && (
-                                  <div style={{ marginBottom: 8 }}>
-                                    <Text strong>Core Finding: </Text>
-                                    <Paragraph style={{ margin: "4px 0 0 0" }}>
-                                      {item.core_finding}
-                                    </Paragraph>
-                                  </div>
-                                )}
-                                {item.takeaway && (
-                                  <div>
-                                    <Text strong>Takeaway: </Text>
-                                    <Paragraph style={{ margin: "4px 0 0 0" }}>
-                                      {item.takeaway}
-                                    </Paragraph>
-                                  </div>
-                                )}
                               </Card>
                             ))}
                           </div>
@@ -276,7 +228,10 @@ export function ProverbsCard({ state, setState }: ProverbsCardProps) {
               children: (
                 <div style={{ padding: "20px 0" }}>
                   {hasFsState && state.fs_state.configurations && state.fs_state.configurations.length >= 2 ? (
-                    <ConfigDiff configurations={state.fs_state.configurations} />
+                    <ConfigDiff 
+                      key={`${state.manifest_path}-${state.last_tool_output || ''}`}
+                      configurations={state.fs_state.configurations} 
+                    />
                   ) : (
                     <Paragraph>
                       {hasFsState && state.fs_state.configurations && state.fs_state.configurations.length === 1
@@ -416,8 +371,7 @@ export function ProverbsCard({ state, setState }: ProverbsCardProps) {
             },
           ]}
           />
-        </>
-      )}
+      </>
     </Card>
   );
 }

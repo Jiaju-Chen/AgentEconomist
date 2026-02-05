@@ -23,11 +23,13 @@ class AgentState(TypedDict):
     - fs_state: 前端需要的 FSState
     - manifest_path: 当前实验的 manifest 路径
     - last_tool_output: 最后一次工具调用的输出
+    - running_tool_name: 当前正在运行的工具名称
     """
     messages: Annotated[List[dict], add_messages]  # 自动累积消息
     fs_state: FSState
     manifest_path: Optional[str]
     last_tool_output: Optional[str]
+    running_tool_name: Optional[str]  # 当前正在运行的工具名称
 
 
 def create_initial_state() -> AgentState:
@@ -41,5 +43,6 @@ def create_initial_state() -> AgentState:
         messages=[],
         fs_state=create_empty_fs_state(),
         manifest_path=None,
-        last_tool_output=None
+        last_tool_output=None,
+        running_tool_name=None
     )

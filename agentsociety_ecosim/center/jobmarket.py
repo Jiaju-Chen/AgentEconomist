@@ -1674,7 +1674,7 @@ Guidelines: Final wages 0.85-1.15x posted wage.
         基于企业利润的智能辞退
         
         Args:
-            firms_to_dismiss: 要辞退的企业列表，每个元素包含 {'firm_id', 'firm', 'profit', 'employees'}
+            firms_to_dismiss: 要辞退的企业列表，每个元素包含 {'company_id', 'firm', 'profit', 'employees'}
             month: 当前月份
             
         Returns:
@@ -1691,7 +1691,7 @@ Guidelines: Final wages 0.85-1.15x posted wage.
         print(f"🔥 第 {month} 月开始基于企业利润的智能辞退")
         
         for firm_data in firms_to_dismiss:
-            firm_id = firm_data['firm_id']
+            firm_id = firm_data['company_id']  # 修复：使用 'company_id' 而非 'firm_id'
             firm = firm_data['firm']
             profit = firm_data['profit']
             employees = firm_data['employees']

@@ -41,9 +41,74 @@ class ProductMarket:
         # 删除self.df，改为从动态的self.products中搜索
         # self.df = load_processed_products()  # 不再需要静态数据
         self.collection_name = "part_products"
-        self.client = QdrantClient(url="http://localhost:6333")
+        
+        # Qdrant 客户端：优先使用本地模式（不需要 Docker）
+        qdrant_url = os.getenv("QDRANT_URL")
+        if qdrant_url:
+            self.client = QdrantClient(url=qdrant_url)
+            logger.info(f"Using remote Qdrant: {qdrant_url}")
+        else:
+            # 本地模式：存储在项目目录下（与 simulation.py 共享同一个 Qdrant 实例）
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            project_root = os.path.dirname(os.path.dirname(current_dir))
+            qdrant_path = os.path.join(project_root, "agentsociety_ecosim", "data", "qdrant_data")
+            self.client = QdrantClient(path=qdrant_path)
+            logger.info(f"Using local Qdrant storage: {qdrant_path} (collection: {self.collection_name})")
+        
+        # 创建 collection（如果不存在）
+        from qdrant_client.models import VectorParams, Distance
+        try:
+            self.client.get_collection(self.collection_name)
+            logger.info(f"Collection {self.collection_name} already exists")
+        except Exception:
+            self.client.create_collection(
+                collection_name=self.collection_name,
+                vectors_config=VectorParams(size=384, distance=Distance.COSINE)
+            )
+            logger.info(f"Created collection {self.collection_name}")
+        
         logger.info("ProductMarket initialized.")
         print("ProductMarket initialized.")
+
+    def batch_load_to_qdrant(self, product_list: List[Product]):
+        """
+        批量加载商品向量到 Qdrant（在 ProductMarket Actor 内部执行，避免文件锁冲突）
+        """
+        from agentsociety_ecosim.utils.embedding import batch_embedding
+        from qdrant_client.models import PointStruct
+        from uuid import uuid5, NAMESPACE_DNS
+        
+        # 🚀 批量处理：先收集所有文本
+        texts = []
+        for product in product_list:
+            text = ' '.join([product.name, product.brand, product.description or '', product.classification])
+            texts.append(text)
+        
+        # 🚀 批量计算所有向量（加速 5-10 倍）
+        vectors = batch_embedding(texts, self.tokenizer, self.model, batch_size=32)
+        
+        # 构建 Qdrant points
+        points = []
+        for product, vector in zip(product_list, vectors):
+            payload = {
+                "name": product.name,
+                "Uniq Id": product.product_id,
+                "description": product.description,
+                "classification": product.classification,
+                "price": product.price,
+                "owner_id": product.owner_id,
+                "description": product.description or ""  # 确保 description 不为 None
+            }
+            
+            # 🔥 使用复合ID确保竞争模式下同一商品的不同供应商都能存储
+            composite_string = f"{product.product_id}@{product.owner_id}"
+            unique_id = str(uuid5(NAMESPACE_DNS, composite_string))
+            points.append(PointStruct(id=unique_id, vector=vector, payload=payload))
+        
+        # 批量插入 Qdrant
+        self.client.upsert(collection_name=self.collection_name, points=points)
+        logger.info(f"[Qdrant] 批量插入 {len(points)} 个商品向量")
+        return len(points)
 
     
     def publish_product(self, product: Product):
@@ -80,11 +145,11 @@ class ProductMarket:
         # 🔧 增加搜索数量以补偿库存过滤
         search_limit = top_k * 3
         
-        hits = self.client.search(
+        hits = self.client.query_points(
             collection_name=self.collection_name,
-            query_vector=query_vec,
+            query=query_vec,
             limit=search_limit
-        )
+        ).points
         
         # 🔥 构建 self.products 的快速查找索引 (product_id, owner_id) -> Product
         products_index = {}
