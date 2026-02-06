@@ -40,6 +40,63 @@ cd frontend
 npm install
 ```
 
+## Data Preparation
+
+The following large data files are not included in the repository. You need to prepare them manually:
+
+### 1. Pre-trained Models
+
+Place your pre-trained models in the `model/` directory:
+
+```bash
+mkdir -p model
+# Copy your model files to model/
+```
+
+### 2. Academic Paper Knowledge Base
+
+Place your paper data in `database/Crawl_Results/` directory. The expected structure:
+
+```
+database/Crawl_Results/
+├── Articles/              # Natural science/comprehensive journals (Nature series, etc.)
+│   └── [journal_name]/
+│       └── [paper_id]/
+│           └── article.json
+└── Articles-Social/       # Social science journals (AER, AJS, etc.)
+    └── [journal_name]/
+        └── [paper_id]/
+            └── article.json
+```
+
+Then build the vector index using SPECTER2 embeddings:
+
+```bash
+cd database
+
+# Build the index
+python scripts/build_index.py
+
+# For incremental indexing (skip already indexed papers)
+python scripts/build_index.py --incremental
+```
+
+For detailed instructions, see [database/README.md](database/README.md).
+
+### 3. Simulation Data
+
+Place simulation data files in the following directories:
+
+```bash
+# Main simulation data
+mkdir -p agentsociety_ecosim/data
+# Copy your simulation data files to agentsociety_ecosim/data/
+
+# Household modeling data
+mkdir -p agentsociety_ecosim/consumer_modeling/household_data
+# Copy your household data files to agentsociety_ecosim/consumer_modeling/household_data/
+```
+
 ## Deployment
 
 ### Backend
