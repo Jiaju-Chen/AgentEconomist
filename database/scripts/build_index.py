@@ -220,10 +220,10 @@ def main():
         
         # 打印索引统计（如果失败不影响整体流程）
         try:
-        index_stats = indexer.get_index_stats()
-        logger.info("索引统计:")
-        for key, value in index_stats.items():
-            logger.info(f"  {key}: {value}")
+            index_stats = indexer.get_index_stats()
+            logger.info("索引统计:")
+            for key, value in index_stats.items():
+                logger.info(f"  {key}: {value}")
         except Exception as e:
             logger.warning(f"获取索引统计失败（不影响索引结果）: {e}")
         
